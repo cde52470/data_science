@@ -1,0 +1,78 @@
+# ---- AI / Agent tooling (do not commit) ----
+.claude/
+.claude.json
+CLAUDE.md
+.cursor/
+.cursorrules
+.aider*
+.continue/
+.github-copilot/
+.codeium/
+.windsurf/
+
+# ---- R / RStudio ----
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+.Renviron
+
+# ---- renv (keep lockfile, ignore library) ----
+renv/library/
+renv/local/
+renv/cellar/
+renv/lock/
+renv/python/
+renv/staging/
+
+# ---- Data (raw data is read-only and large; do not version) ----
+data/raw/
+data/processed/
+data/interim/
+*.csv
+*.tsv
+*.parquet
+*.feather
+*.rds
+*.rda
+!data/.gitkeep
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# ---- Trained models ----
+models/*.rds
+models/*.rda
+models/*.RData
+!models/.gitkeep
+
+# ---- Reports / generated outputs ----
+reports/*.html
+reports/*_cache/
+reports/*_files/
+Results/figures/*.png
+Results/figures/*.jpg
+*_cache/
+*_files/
+
+# ---- Secrets / credentials ----
+.env
+.env.*
+*.key
+*.pem
+api_keys.R
+secrets.R
+config/secrets.yml
+
+# ---- OS / Editor ----
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# ---- Logs ----
+*.log
+logs/
