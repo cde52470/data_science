@@ -88,11 +88,32 @@ provenance manifest，join key 為 `date × stadium`。
 
 ### 3.3 Scope window
 
-- **訓練 / 驗證**：2020 – 2023 例行賽（4 季 ≈ 960 – 1 000 場）。
+- **訓練 / 驗證**：2021 – 2023 例行賽（3 季 ≈ 720 場）。
 - **保留測試集**：2024 例行賽（≈ 240 場），time-based hold-out。
 - **2025 部署視窗**：模型訓練完凍結，每日預測經 Shiny app 推送。
-- **重要例外**：2020 球季因 COVID 開季延後 + 部分閉門賽，主場優勢可能異常；
-  納入但會在 §9 列為敏感性分析項目。
+- **2020 球季 → 整年排除（Issue #4-A 決議, 2026-05-13）**：
+  COVID 開季延後 + 前 ~2 個月閉門賽（主場優勢物理基礎被結構性抽走）+ 洋將回不來
+  三項異常疊加，且 `R/elo_pythag.R` 的 cold-start Elo 在 2020 上半季會
+  *為錯的理由* 看起來弱（strategy_memo §3 F1）。Trade-off：可用樣本
+  從 ≈ 1 080 降至 ≈ 960，detectable ΔAUC 由 0.03 升至 ≈ 0.035（仍符合
+  publishable 與 deployable 門檻，見 §7）。Mitigation：data-collector
+  仍 **保留** 2020 raw rows（不在 raw 層過濾），僅在 model-builder
+  的 `model_frame` 過濾 → 保留日後 sensitivity 分析能力。
+
+### 3.4 Tie / postponement / incomplete adjudication（Issue #3-C, 2026-05-13）
+
+按 **CPBL 官方規則**（《中華職棒聯盟比賽規章》正式版，2024）判定：
+
+| 情境 | 規則來源 | `is_home_win` | `is_completed` | `is_postponed` |
+|---|---|---|---|---|
+| 完整 9 局比賽 | §1 例行賽以 9 局為原則 | 0 / 1 | TRUE | FALSE |
+| 提前結束（颱風 / 雷雨 / 雙方放棄）但 ≥ 5 局且主隊領先 / ≥ 4.5 局且客隊領先 | §3 「7 局已成立」延伸至 9 局制 | 0 / 1 | TRUE | FALSE |
+| 不足 5 局而中止 → **保護比賽** | §3.4 保護比賽條款 | `NA` (drop) | FALSE | FALSE |
+| 雨延 / 延賽 → 改期 | §4 雨天延賽 | drop 該日 row；改期日另開 `game_id` | — | TRUE |
+| 平手（9 局後 + 延長局數結束 0:0 或同分） | §2 例行賽延長至 12 局，仍平手即和局 | `NA` (drop) | TRUE | FALSE |
+
+data-collector 在 `raw_games.csv` *保留所有 row*，僅在 model_frame
+階段套用上表過濾；棄置原因記錄於 `_provenance/manifest.json`。
 
 ---
 
@@ -181,7 +202,7 @@ family-wise α，保留 α = 0.05。
 
 ### 6.1 Train / Validation / Test split
 
-- **Train**: 2020 – 2022
+- **Train**: 2021 – 2022（2020 整年排除，見 §3.3 Issue #4-A）
 - **Validation (time-aware CV)**: 2023, 用 `rsample::sliding_period()` 滾月窗
 - **Test (held-out, 一次性使用)**: 2024 全季
 
@@ -245,20 +266,28 @@ family-wise α，保留 α = 0.05。
 | (z_α + z_β)² | (1.96 + 0.84)² ≈ 7.84 |
 | n ≈ 7.84 · 0.124 / 0.03² | **≈ 1 080 場** |
 
-### 8.3 對照可得樣本
+### 8.3 對照可得樣本（更新：Issue #4-A 後）
 
 | 來源 | 預估場數 |
 |---|---|
 | CPBL 一季例行賽 | ≈ 240 |
-| 2020 – 2024（5 季） | **≈ 1 200** |
-| 扣 10 % 雨延 / 缺資料 / 平手 | ≈ 1 080 |
+| ~~2020 – 2024（5 季）~~ → **2021 – 2024（4 季）** | ≈ 960 |
+| 扣 10 % 雨延 / 缺資料 / 平手（依 §3.4 CPBL 規則） | **≈ 860** |
 
-**結論**：樣本剛好踩在 ΔAUC = 0.03 的可偵測線上，因此：
+**結論**：排除 2020 後樣本由 ≈ 1 080 降至 ≈ 860，detectable ΔAUC 由 0.03
+升至 ≈ 0.035。仍符合 §7 Bar #2 publishable（AUC ≥ 0.60）與 Bar #3
+deployable（AUC ≥ 0.62）門檻；只是 effect size 偵測精度從 "small" 退一步至
+"small-to-moderate"。
+
+因此：
 
 1. 一定要做 paired test（不可用 two-sample），否則 effective n 砍半。
 2. 子群分析（單一球場、單一隊伍）會 *underpower*，須先在報告中聲明。
-3. 若 data-collector 回報實際可用樣本 < 900，立刻回頭收斂目標：先做
+3. 若 data-collector 回報實際可用樣本 < 750，立刻回頭收斂目標：先做
    *stadium-only* 模型，weather 留待未來年度補資料。
+4. 若 must-beat bar（charter amendment #3）失敗（m7 未顯著贏 m2 95% CI），
+   報告中明寫「在 ΔAUC ≈ 0.035 解析度下，weather 在 team-strength 之上
+   無增量訊號」— 這是有效的 *null result*，不是專案失敗。
 
 ---
 
@@ -267,7 +296,7 @@ family-wise α，保留 α = 0.05。
 | # | 風險 | 嚴重度 | 機率 | 緩解 |
 |---|---|---|---|---|
 | R1 | **Selection bias — 雨延 / 取消** | 高 | 中 | 取消場次顯然偏向露天球場 → 在 weather 模型上會低估雨天負面效應。緩解：保留「原排程但未開打」flag，敏感性分析時納入 |
-| R2 | **Concept drift — 規則 / 球員 / 球場異動** | 高 | 高 | 大巨蛋 2024 啟用、台鋼 2024 擴編、洋將額度與 ABS 系統試行可能改變賽季結構。緩解：在 §7 fairness 階段分層；最終模型加上 `season` fixed effect 作 sanity check |
+| R2 | **Concept drift — 規則 / 球員 / 球場異動** | 高 | 高 | 大巨蛋 2024 啟用、台鋼 2024 擴編、洋將額度與 ABS 系統試行可能改變賽季結構。**2020 COVID 球季因疊加異常已整年排除（Issue #4-A，見 §3.3）**。緩解：在 §7 fairness 階段分層；最終模型加上 `season` fixed effect 作 sanity check |
 | R3 | **Data leakage — 後驗特徵** | 災難級 | 低 | 嚴禁使用 `away_score`, `total_runs`, `winning_pitcher` 等場後欄位。緩解：在 §10 hand-off 明列「賽前可得」欄位白名單；data-collector 必須遵守 |
 | R4 | **Weather station outage / 缺值** | 中 | 中 | CWA 觀測站偶有斷訊；某些球場（嘉義、澄清湖）距離最近測站 > 5 km。緩解：data-collector 須記錄 `station_id`, `station_distance_km`, `obs_lag_min`；EDA 階段建立 missingness audit；超過 X % 缺值的場次列為 sensitivity check |
 | R5 | **Class imbalance** | 低 | 高 | 主隊勝率 ≈ 0.54，僅輕微不平衡，不需 SMOTE。緩解：以 Brier / log-loss 監督，避免 accuracy 一面倒 |
@@ -332,8 +361,8 @@ family-wise α，保留 α = 0.05。
 
 ### 10.3 Open questions (請 Sub-Agent 2 回答後 patch 本 charter)
 
-1. 2020 球季因 COVID 部分閉門賽是否要旗標 `is_no_audience` 加入 Group A？
-   *目前 charter 不納入；待資料盤點後決定。*
+1. ~~2020 球季因 COVID 部分閉門賽是否要旗標 `is_no_audience` 加入 Group A？~~
+   ✅ **Closed (Issue #4-A, 2026-05-13)**: 2020 整年排除（見 §3.3）。
 2. 大巨蛋 2024 春訓暖身賽要不要保留作為 dome 行為的初始 EDA？
    *建議：保留但不進建模，僅做 EDA 註腳。*
 3. wind_dir 的 8-point 編碼在 CWA API 中是 degrees 還是字串？決定特徵
@@ -384,3 +413,47 @@ family-wise α，保留 α = 0.05。
 | **POC** | Proof of Concept，最小可行驗證 |
 | **Time-aware split** | 以時間為界切分 train / test，避免未來資料洩漏 |
 | **`tidymodels`** | R 生態系下的統一建模介面（recipes + parsnip + tune + yardstick + workflows） |
+
+---
+
+## Appendix C. Charter Amendments Log
+
+> 此 log **追加**式記錄，不重寫歷史條目。每筆需含：日期、決議 ID、條目、
+> 影響的章節、決策者。
+
+### C.1 In-charter amendments (this session, 2026-05-13)
+
+| ID | 條目 | 影響章節 | 決策者 |
+|---|---|---|---|
+| **Issue #3-C** | Tie / postponement / incomplete 一律依 **CPBL 官方規則**（《中華職棒聯盟比賽規章》正式版 2024）判定，data-collector 在 raw 層保留全部 row，filter 在 model_frame 層。 | §3.4 新增；§10.1 `is_completed` / `is_postponed` 欄位定義 cross-ref §3.4 | User (chat) |
+| **Issue #4-A** | 2020 球季因 (i) 開季延後 (ii) 部分閉門賽 (iii) 洋將回不來 + Elo cold-start，**整年排除**。raw 層保留，model_frame 過濾。 | §3.3, §6.1, §8.3, §9 R2, §10.3 Q1 | User (chat) |
+
+### C.2 Pre-existing amendments from PR #1 review (strategy_memo §0–§8)
+
+下列 7 條已在 PR #1 review + model-builder strategy_memo 中決議並寫入
+code（`R/elo_pythag.R`, `R/build_recipes.R`, scripts/）。它們 *尚未* 完整折回
+此 charter（schema / hypothesis / metrics 章節）。**遞延至下一輪
+charter-patch pass**；目前 **唯一信任來源** 為 `models/poc/strategy_memo.md`。
+
+| Amendment | 摘要 | 落實位置 |
+|---|---|---|
+| #1 — Schema additions | 新增 `home_elo_pre`, `away_elo_pre`, `home_pythag_30g`, `away_pythag_30g`, `home_rest_days`, `away_rest_days`, `is_dome`, `station_distance_km` 共 8 個 pre-game team-strength + 場館屬性欄位 | `R/elo_pythag.R`; data-collector hand-off 增列 `team_state.csv` (amendment #7) |
+| #2 — m1–m7 重排 | 將 m1 重定義為 **team-strength only**（Elo + Pythag + rest），其餘 ablation 依此為 anchor 重排 | `R/build_recipes.R` |
+| #3 — Must-beat bar 升級 | m7 必須勝過 **m2 (team) 而非 m1 (intercept)** 的 95 % bootstrap CI 上界；m1 變成 trivial baseline，m2 是 hard baseline | `scripts/03a_phase_a_poc.R` bootstrap 比較 |
+| #4 — Dome weather 處理 | `is_dome == TRUE` 的場次：weather 不進 m3/m5/m6/m7（仍保留供 EDA） | `R/build_recipes.R` step_filter / step_mutate_at |
+| #5 — Metric set | 同步收 ROC-AUC **與** PR-AUC（subgroup sanity）+ Brier + calibration slope | `yardstick::metric_set()` in POC + production scripts |
+| #6 — Time-aware CV cadence | 改用 `rsample::sliding_period()` 月窗，period = `"month"`, lookback = 6, assess = 1 | `scripts/03a_phase_a_poc.R` |
+| #7 — `team_state.csv` 加入 hand-off | data-collector 額外輸出 `data/raw/team_state.csv`（per game_id × side 的 pre-game Elo / Pythag / rest），但 *正典實作* 仍在 `R/elo_pythag.R`（single source of truth） | §10.1 將於 next pass 增列此表 schema |
+
+### C.3 Pending charter-patch tasks
+
+- [ ] 將 amendments #1, #4 折入 §10.1 `raw_games.csv` / `raw_weather.csv` 的 schema 表。
+- [ ] 將 amendment #2 折入 §6 model table（重寫 m1–m7 公式欄）。
+- [ ] 將 amendment #3 折入 §7 Bar #1（「m7 vs m2 95% CI 上界」取代「m7 vs m1」）。
+- [ ] 將 amendment #5 折入 §7.2 secondary metrics。
+- [ ] 將 amendment #6 折入 §6.1。
+- [ ] 將 amendment #7 折入 §10.1 新增 `team_state.csv` 區塊。
+
+> 在 pending 項全部完成前，**code 與 charter 之間有已知漂移**；
+> 任何 downstream agent 若引用 §6 / §7 / §10.1 必須 cross-check
+> `models/poc/strategy_memo.md` 以避免 follow stale spec。
