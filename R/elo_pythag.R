@@ -70,9 +70,21 @@ compute_elo <- function(games,
   games <- games |>
     arrange(.data$date, .data$game_id)
 
-  # rating cache, list-keyed by team name
+  # Coerce team columns to character ONCE.
+  # 原因: 03a_phase_a_poc.R 進來時 home_team/away_team 是 factor
+  # (dplyr::mutate(... as.factor)). 用 factor 做 `list[[x]]` 會被 R 內部
+  # 強制轉成 integer (factor level number), 結果在空 list 上觸發
+  # "subscript out of bounds". 必須以 character 做 list key 才正確。
+  # 詳見 GHA run 25790218754 / 25790217325 fail trace.
+  team_chr <- list(
+    home = as.character(games$home_team),
+    away = as.character(games$away_team)
+  )
+
+  # rating cache, list-keyed by team **character** name
   ratings <- list()
   get_rating <- function(team) {
+    team <- as.character(team)   # defensive double-coerce
     if (is.null(ratings[[team]])) init_rating else ratings[[team]]
   }
 
@@ -83,8 +95,8 @@ compute_elo <- function(games,
   away_post <- numeric(n)
 
   for (i in seq_len(n)) {
-    h_team <- games$home_team[i]
-    a_team <- games$away_team[i]
+    h_team <- team_chr$home[i]
+    a_team <- team_chr$away[i]
     h_pre  <- get_rating(h_team)
     a_pre  <- get_rating(a_team)
 
