@@ -1,0 +1,5 @@
+﻿,linkage,cophenetic_r,best_balanced_k,balanced_silhouette,min_cluster_frac
+0,ward,0.3273,2.0,0.1002,0.2424
+1,complete,0.3774,2.0,0.0984,0.2492
+2,average,0.6467,,,
+3,single,0.5664,,,

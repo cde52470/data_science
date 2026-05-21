@@ -1,0 +1,4 @@
+﻿,algo,k,silhouette,CH,DBI,bootstrap_jaccard
+0,kmeans,2,0.115,196.64,2.523,0.918
+1,hierarchy[ward],2,0.1,130.494,2.635,0.574
+2,gmm,4,-0.01,25.404,4.902,0.658

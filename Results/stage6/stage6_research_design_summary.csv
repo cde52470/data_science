@@ -1,0 +1,5 @@
+﻿,面向,本研究設計,解讀
+0,資料來源,直接從 rebas.tw GitHub Releases 下載 2023 與 2024 regular season OpenData。,資料取得可重現，不依賴任何本機 repo 或外部已清理結果。
+1,分析單位,一列代表一隊一場 team-game performance。,適合分析球隊單場攻守節奏、主客場情境與分群結構。
+2,主要方法,描述統計、EDA、PCA、多種 clustering、surrogate SHAP 解釋。,這是獨立的 unsupervised feature discovery，不使用既有模型結論。
+3,最後輸出,original/direct box-score features + derived semantic/numeric/unsupervised features。,輸出可作為後續模型候選資料，但是否可用需依預測時間點檢查 leakage。

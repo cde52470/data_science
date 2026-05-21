@@ -1,0 +1,5 @@
+﻿,runs_scored,runs_scored,runs_scored,runs_allowed,runs_allowed,runs_allowed,early_runs,early_runs,early_runs,middle_runs,middle_runs,middle_runs,late_runs,late_runs,late_runs,H,H,H,BB,BB,BB,extra_base_hits,extra_base_hits,extra_base_hits,whip_like,whip_like,whip_like,strikeout_walk_ratio,strikeout_walk_ratio,strikeout_walk_ratio
+,mean,std,median,mean,std,median,mean,std,median,mean,std,median,mean,std,median,mean,std,median,mean,std,median,mean,std,median,mean,std,median,mean,std,median
+season_tag,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2023,4.187,3.137,4.0,4.187,3.137,4.0,1.393,1.744,1.0,1.463,1.782,1.0,1.268,1.644,1.0,8.797,3.467,8.0,3.098,1.986,3.0,2.127,1.616,2.0,1.345,0.493,1.333,2.956,2.309,2.292
+2024,4.188,3.147,4.0,4.188,3.147,4.0,1.296,1.693,1.0,1.482,1.871,1.0,1.329,1.741,1.0,8.897,3.43,8.0,3.035,1.905,3.0,2.129,1.584,2.0,1.36,0.501,1.333,3.134,2.608,2.333

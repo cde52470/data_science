@@ -1,0 +1,7 @@
+﻿,method,best_k
+0,elbow (kneed),3
+1,silhouette,2
+2,Calinski-Harabasz,2
+3,Davies-Bouldin (min),7
+4,gap statistic,3
+5,GMM BIC (min),4

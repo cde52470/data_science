@@ -1,7 +1,39 @@
-# ---- AI / Agent tooling (do not commit) ----
-.claude/
-.claude.json
-CLAUDE.md
+# === macOS / OS ===
+.DS_Store
+**/.DS_Store
+Thumbs.db
+
+# === Python ===
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# === R / RStudio ===
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+.Renviron
+
+# === renv ===
+renv/library/
+renv/local/
+renv/cellar/
+renv/lock/
+renv/python/
+renv/staging/
+
+# === Editor ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# === AI / Agent tooling (note: legacy/version1/.claude/ and legacy/version1/CLAUDE.md
+#     ARE committed as part of the v1 snapshot; this pattern only blocks future
+#     fresh .claude/ at the top level)
 .cursor/
 .cursorrules
 .aider*
@@ -10,52 +42,28 @@ CLAUDE.md
 .codeium/
 .windsurf/
 
-# ---- R / RStudio ----
-.Rproj.user/
-.Rhistory
-.RData
-.Ruserdata
-*.Rproj
-.Renviron
-
-# ---- renv (keep lockfile, ignore library) ----
-renv/library/
-renv/local/
-renv/cellar/
-renv/lock/
-renv/python/
-renv/staging/
-
-# ---- Data (raw data is read-only and large; do not version) ----
+# === Derived / regenerable artefacts ===
+Derived/
 data/raw/
 data/processed/
 data/interim/
-*.csv
-*.tsv
-*.parquet
-*.feather
-*.rds
-*.rda
-!data/.gitkeep
-!data/raw/.gitkeep
-!data/processed/.gitkeep
 
-# ---- Trained models ----
-models/*.rds
-models/*.rda
-models/*.RData
-!models/.gitkeep
+# === Runtime side-effects ===
+**/.fonts/
+Scripts/data/
+**/graphify-out/
+**/cpbl_pregame_winprob*-checkpoint*
 
-# ---- Reports / generated outputs ----
-reports/*.html
-reports/*_cache/
-reports/*_files/
-Results/figures/*.png
-Results/figures/*.jpg
-*_cache/
-*_files/
+# === Results scratch (Results/stage*/ ARE committed; these are intermediate dumps) ===
+Results/cpbl_artifacts/
+Results/cpbl_artifacts.zip
+outputs/
 
-# ---- Secrets / credentials ----
+# === rebas runtime downloads (Data/2023/ IS committed; only Data/2024/ runtime caches blocked) ===
+Data/2024/*.zip
+Data/2024/CPBL-*/
+
+# === Secrets / credentials ===
 .env
 .env.*
 *.key
@@ -64,15 +72,6 @@ api_keys.R
 secrets.R
 config/secrets.yml
 
-# ---- OS / Editor ----
-.DS_Store
-Thumbs.db
-*.swp
-*.swo
-*~
-.vscode/
-.idea/
-
-# ---- Logs ----
+# === Logs ===
 *.log
 logs/

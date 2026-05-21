@@ -1,0 +1,9 @@
+﻿,new_feature,kind,description,interpretation
+0,cluster_id,categorical,Final hard cluster assignment (2 clusters via kmeans),0: prior_run_diff_mean_10↑ · prior_run_diff_mean_5↑; 1: prior_run_diff_mean_10↓ · prior_run_diff_mean_5↓
+1,gmm_p0,soft probability,Posterior probability of GMM component 0,smooth membership; useful as regression covariate
+2,gmm_p1,soft probability,Posterior probability of GMM component 1,smooth membership; useful as regression covariate
+3,gmm_p2,soft probability,Posterior probability of GMM component 2,smooth membership; useful as regression covariate
+4,gmm_p3,soft probability,Posterior probability of GMM component 3,smooth membership; useful as regression covariate
+5,pc1,continuous PC score,Projection onto PC1 (18.7% variance),"loaded by ['prior_run_diff_mean_10', 'prior_run_diff_mean_5', 'prior_runs_scored_mean_5']"
+6,pc2,continuous PC score,Projection onto PC2 (13.7% variance),"loaded by ['opp_prior_runs_scored_mean_5', 'opp_prior_runs_scored_mean_10', 'opp_prior_run_diff_mean_10']"
+7,pc3,continuous PC score,Projection onto PC3 (7.8% variance),"loaded by ['prior_runs_allowed_mean_10', 'prior_runs_allowed_mean_5', 'prior_whip_like_mean_10']"
