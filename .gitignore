@@ -1,0 +1,54 @@
+# === macOS / OS ===
+.DS_Store
+**/.DS_Store
+Thumbs.db
+
+# === Python ===
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+*.egg-info/
+# anchored so it only matches root-level Python build/ artefacts,
+# NOT our Scripts/build/ pipeline directory
+/build/
+/dist/
+
+# === Editor ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# === AI / Agent tooling (top-level only; legacy/version*/.claude/ may be archived)
+.cursor/
+.cursorrules
+.aider*
+.continue/
+.codeium/
+.windsurf/
+
+# === Notebook runtime caches & rebas downloads ===
+# converge_analysis.ipynb caches rebas zips under data/raw_rebas/ at runtime.
+# These are regenerable — don't commit.
+data/raw_rebas/
+data/cache/
+
+# === Results scratch / packaging artefacts ===
+# Results/stage*/ ARE committed (the figures/tables backing the report).
+# These patterns block one-off packaging dumps only.
+Results/cpbl_artifacts/
+Results/cpbl_artifacts.zip
+
+# === Secrets / credentials ===
+.env
+.env.*
+*.key
+*.pem
+config/secrets.yml
+
+# === Logs ===
+*.log
+logs/

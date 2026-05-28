@@ -1,0 +1,3 @@
+﻿,GroupKFold_AUC
+"time-lag=True(滞後,leak-free)",0.5057
+time-lag=False(同場),0.9598
