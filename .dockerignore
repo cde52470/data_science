@@ -1,0 +1,7 @@
+*.png
+*.R.history
+pca_analysis.R
+decision_plot_old.R
+__pycache__/
+*.pyc
+.git
